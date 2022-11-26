@@ -6,3 +6,10 @@ typedef struct
     int y;
     std::vector<int> corners;
 } Board;
+
+typedef struct
+{
+    int x;
+    int y;
+    int size;
+} Square;

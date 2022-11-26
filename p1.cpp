@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int getBiggestSquare(Board board)
+int getBiggestSquareSize(Board board)
 {
     int size = board.corners.size();
     int squareSize = 0;
@@ -18,17 +18,46 @@ int getBiggestSquare(Board board)
     return squareSize;
 }
 
-int getPossibleSquarePositions(int side, Board board)
+vector<Square> *getPossibleSquares(int size, Board board)
 {
-    if (side > board.y || side > board.x)
-        return 0;
+    vector<Square> *possibleSquares = new vector<Square>;
+    if (size > board.y || size > board.x)
+        return possibleSquares;
 
-    int possiblePositions = 0;
-    for (int y = 0; board.y - y >= side; y++)
-        for (int x = 0; board.corners[y] - x >= side; x++)
-            possiblePositions++;
+    for (int y = 0; board.y - y >= size; y++)
+    {
+        for (int x = 0; board.corners[y] - x >= size; x++)
+        {
+            Square square = {.x = x, .y = y, .size = size};
+            (*possibleSquares).push_back(square);
+        }
+    }
 
-    return possiblePositions;
+    return possibleSquares;
+}
+
+Board getBottomBoard(Square square, Board board)
+{
+    Board newboard;
+    return board;
+}
+
+/*vector<Board> splitBoard(int square, Board board)
+{
+}*/
+
+int getPossibleConfigurations(Board board)
+{
+    int biggestSquare = getBiggestSquareSize(board);
+    if (biggestSquare == 1)
+        return 1;
+    if (biggestSquare == 2)
+        return 1 + (*getPossibleSquares(biggestSquare, board)).size();
+    return 0;
+}
+
+void printSquare(Square s) {
+    cout << "X: " << s.x << ", " << "Y: " << s.y << ", " << "Size: " << s.size << endl;
 }
 
 int main()
@@ -39,7 +68,10 @@ int main()
     vector<int> corners = {0, 2, 3, 5};
     board.corners = corners;
 
-    LOG(getPossibleSquarePositions(2, board));
+    vector<Square>* vector = getPossibleSquares(2, board);
+    for (const auto& s : (*vector))
+        printSquare(s);
+    
 
     return 0;
 }
