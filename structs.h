@@ -2,7 +2,7 @@
 
 typedef struct
 {
-    int n;
-    int m;
+    int x;
+    int y;
     std::vector<int> corners;
 } Board;
