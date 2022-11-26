@@ -11,7 +11,7 @@ int getBiggestSquare(Board board)
     int squareSize = 0;
 
     for (int i = 0; i < size; i++)
-        if (board.n-i >= board.corners[i])
+        if (board.n - i >= board.corners[i])
             if (board.corners[i] > squareSize)
                 squareSize = board.corners[i];
 
