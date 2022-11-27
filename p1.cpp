@@ -98,7 +98,7 @@ int cappedSizeCombinations(int tile_size, Board &board) {
         getPossibleTiles(tiles, tile_size, board);
         removeDoubledCases(removed_tiles, tiles);
 
-        // for the not removed tiles
+        // for the normal tiles
         for (Tile &tile : tiles) {
             bottom_board = Board();
             top_board = Board();
@@ -136,9 +136,6 @@ int cappedSizeCombinations(int tile_size, Board &board) {
 
 int getCombinations(Board &board) {
     int tile_size = getMaxTileSize(board);
-
-    if (tile_size == 1 || tile_size == 0)
-        return tile_size;
     return cappedSizeCombinations(tile_size, board);
 }
 
