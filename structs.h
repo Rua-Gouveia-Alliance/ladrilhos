@@ -3,7 +3,7 @@
 typedef struct {
     int x;
     int y;
-    std::vector<int> *corners;
+    std::vector<int> corners;
 } Board;
 
 typedef struct {
