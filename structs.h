@@ -1,14 +1,12 @@
 #include <vector>
 
-typedef struct
-{
+typedef struct {
     int x;
     int y;
-    std::vector<int>* corners;
+    std::vector<int> corners;
 } Board;
 
-typedef struct
-{
+typedef struct {
     int x;
     int y;
     int size;

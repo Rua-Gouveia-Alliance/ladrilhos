@@ -6,19 +6,19 @@
 
 using namespace std;
 
-void printTile(Tile t) {
+void printTile(Tile &t) {
     cout << "X: " << t.x << ", Y: " << t.y << ", Size: " << t.size << endl;
 }
 
-void printBoard(Board b) {
+void printBoard(Board &b) {
     cout << "X: " << b.x << ", Y: " << b.y << endl << "Corners:" << endl;
-    vector<int> corners = *(b.corners);
+    vector<int> corners = b.corners;
     int size = corners.size();
     for (int i = 0; i < size; i++)
         cout << "X: " << corners[i] << ", Y:" << i << endl;
 }
 
-bool overlap(Tile t1, Tile t2) {
+bool overlap(Tile &t1, Tile &t2) {
     if (t1.x >= t2.x + t2.size)
         return false;
     if (t1.y >= t2.y + t2.size)
@@ -30,8 +30,8 @@ bool overlap(Tile t1, Tile t2) {
     return true;
 }
 
-int getMaxTileSize(Board board) {
-    vector<int> corners = *(board.corners);
+int getMaxTileSize(Board &board) {
+    vector<int> corners = board.corners;
 
     int tile_size = 0;
     for (int i = 0; i < board.y; i++)
@@ -43,110 +43,112 @@ int getMaxTileSize(Board board) {
     return tile_size;
 }
 
-vector<Tile> *getPossibleTiles(int size, Board board) {
-    vector<Tile> *possible_squares = new vector<Tile>;
-    vector<int> corners = *(board.corners);
+void getPossibleTiles(vector<Tile> &tiles, int size, Board &board) {
+    vector<int> corners = board.corners;
 
     if (size > board.y || size > board.x || size == 0)
-        return possible_squares;
+        return;
 
     for (int y = 0; board.y - y >= size; y++)
         for (int x = 0; corners[y] - x >= size; x++) {
             Tile square = {.x = x, .y = y, .size = size};
-            possible_squares->push_back(square);
+            tiles.push_back(square);
         }
-
-    return possible_squares;
 }
 
-Board getBottomBoard(Tile tile, Board board) {
-    int x = tile.x + tile.size;
-    int y = board.y - tile.y;
+void getBottomBoard(Board &result, Tile &tile, Board &board) {
+    result.x = tile.x + tile.size;
+    result.y = board.y - tile.y;
     int corner_x = tile.x;
-    vector<int> *corners = new vector<int>;
 
-    for (int i = 0; i <= y; i++)
-        corners->push_back(i < tile.size ? corner_x : x);
-
-    Board bottom_board = {.x = x, .y = y, .corners = corners};
-    return bottom_board;
+    for (int i = 0; i <= result.y; i++)
+        result.corners.push_back(i < tile.size ? corner_x : result.x);
 }
 
-Board getTopBoard(Tile tile, Board board) {
-    int x = tile.x + tile.size;
-    int y = tile.y;
-    vector<int> corners = *(board.corners);
-    vector<int> *top_corners = new vector<int>;
+void getTopBoard(Board &result, Tile &tile, Board &board) {
+    result.x = tile.x + tile.size;
+    result.y = tile.y;
 
-    for (int i = 0; i <= y; i++)
-        top_corners->push_back(corners[i] > x ? x : corners[i]);
-
-    Board top_board = {.x = x, .y = y, .corners = top_corners};
-    return top_board;
+    for (int i = 0; i <= result.y; i++)
+        result.corners.push_back(
+            board.corners[i] > result.x ? result.x : board.corners[i]);
 }
 
-Board getSideBoard(Tile tile, Board board) {
+void getSideBoard(Board &result, Tile &tile, Board &board) {
     int offset = tile.size + tile.x;
-    int x = board.x - offset;
-    int y = board.y;
-    vector<int> corners = *(board.corners);
-    vector<int> *side_corners = new vector<int>;
+    result.x = board.x - offset;
+    result.y = board.y;
+
     int corner;
-
-    for (int i = 0; i <= y; i++) {
-        corner = corners[i] - offset;
-        side_corners->push_back(corner < 0 ? 0 : corner);
+    for (int i = 0; i <= result.y; i++) {
+        corner = board.corners[i] - offset;
+        result.corners.push_back(corner < 0 ? 0 : corner);
     }
-
-    Board side_board = {.x = x, .y = y, .corners = side_corners};
-    return side_board;
 }
 
-vector<Tile> *removeDoubledCases(vector<Tile> &tiles) {
-    vector<Tile> *removed_tiles = new vector<Tile>;
+void removeDoubledCases(vector<Tile> &removed_tiles, vector<Tile> &tiles) {
     int size = tiles.size();
     for (int i = 0; i < size; i++)
         for (int j = 0; j < size; j++)
             if (!overlap(tiles[i], tiles[j])) {
-                removed_tiles->push_back(tiles[j]);
+                removed_tiles.push_back(tiles[j]);
                 tiles.erase(tiles.begin() + j);
                 size--;
             }
-    return removed_tiles;
 }
 
-int cappedSizeCombinations(int tile_size, Board board) {
+int cappedSizeCombinations(int tile_size, Board &board) {
     int result = 1;
 
     if (tile_size == 1 || tile_size == 0)
         return result;
 
+    vector<Tile> tiles;
+    vector<Tile> removed_tiles;
+    Board bottom_board;
+    Board top_board;
+    Board side_board;
     do {
-        vector<Tile> tiles = *getPossibleTiles(tile_size, board);
-        vector<Tile> removed_tiles = *removeDoubledCases(tiles);
+        getPossibleTiles(tiles, tile_size, board);
+        removeDoubledCases(removed_tiles, tiles);
 
         // for the not removed tiles
-        for (Tile &tile : tiles)
-            result +=
-                (cappedSizeCombinations(tile_size,
-                                        getBottomBoard(tile, board)) *
-                 cappedSizeCombinations(tile_size, getTopBoard(tile, board)) *
-                 cappedSizeCombinations(tile_size, getSideBoard(tile, board)));
+        for (Tile &tile : tiles) {
+            bottom_board = Board();
+            top_board = Board();
+            side_board = Board();
+            getBottomBoard(bottom_board, tile, board);
+            getTopBoard(top_board, tile, board);
+            getSideBoard(side_board, tile, board);
+            result += (cappedSizeCombinations(tile_size, bottom_board) *
+                       cappedSizeCombinations(tile_size, top_board) *
+                       cappedSizeCombinations(tile_size, side_board));
+        }
 
         // for the removed tiles
-        for (Tile &tile : removed_tiles)
-            result += (cappedSizeCombinations(tile_size - 1,
-                                              getBottomBoard(tile, board)) *
-                       cappedSizeCombinations(tile_size - 1,
-                                              getTopBoard(tile, board)) *
-                       cappedSizeCombinations(tile_size - 1,
-                                              getSideBoard(tile, board)));
+        for (Tile &tile : removed_tiles) {
+            bottom_board = Board();
+            top_board = Board();
+            side_board = Board();
+            getBottomBoard(bottom_board, tile, board);
+            getTopBoard(top_board, tile, board);
+            getSideBoard(side_board, tile, board);
+            result += (cappedSizeCombinations(tile_size - 1, bottom_board) *
+                       cappedSizeCombinations(tile_size - 1, top_board) *
+                       cappedSizeCombinations(tile_size - 1, side_board));
+        }
+
+        tiles = vector<Tile>();
+        removed_tiles = vector<Tile>();
+        bottom_board = Board();
+        top_board = Board();
+        side_board = Board();
     } while (--tile_size > 1);
 
     return result;
 }
 
-int getCombinations(Board board) {
+int getCombinations(Board &board) {
     int tile_size = getMaxTileSize(board);
 
     if (tile_size == 1 || tile_size == 0)
@@ -155,13 +157,11 @@ int getCombinations(Board board) {
 }
 
 int main() {
-    vector<int> corners = {4, 4, 4};
-    Board board = {.x = 4, .y = 3, .corners = &corners};
+    Board board = {.x = 4, .y = 3, .corners = {4, 4, 4}};
 
     LOG(getCombinations(board));
 
-    corners = {0, 2, 3, 5, 5};
-    board = {.x = 5, .y = 4, .corners = &corners};
+    board = {.x = 5, .y = 4, .corners = {0, 2, 3, 5, 5}};
     LOG(getCombinations(board));
 
     return 0;
