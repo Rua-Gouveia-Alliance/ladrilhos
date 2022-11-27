@@ -2,21 +2,7 @@
 #include <iostream>
 #include <list>
 
-#define LOG(x) std::cout << x << std::endl
-
 using namespace std;
-
-void printTile(Tile &t) {
-    cout << "X: " << t.x << ", Y: " << t.y << ", Size: " << t.size << endl;
-}
-
-void printBoard(Board &b) {
-    cout << "X: " << b.x << ", Y: " << b.y << endl << "Corners:" << endl;
-    vector<int> corners = b.corners;
-    int size = corners.size();
-    for (int i = 0; i < size; i++)
-        cout << "X: " << corners[i] << ", Y:" << i << endl;
-}
 
 bool overlap(Tile &t1, Tile &t2) {
     if (t1.x >= t2.x + t2.size)
@@ -156,13 +142,23 @@ int getCombinations(Board &board) {
     return cappedSizeCombinations(tile_size, board);
 }
 
+void readInput(Board &board) {
+    scanf("%d", &board.y);
+    scanf("%d", &board.x);
+
+    int corner;
+    for (int i = 0; i < board.y; i++) {
+        scanf("%d", &corner);
+        board.corners.push_back(corner);
+    }
+}
+
 int main() {
-    Board board = {.x = 4, .y = 3, .corners = {4, 4, 4}};
+    // Create board and read input
+    Board board;
+    readInput(board);
 
-    LOG(getCombinations(board));
-
-    board = {.x = 5, .y = 4, .corners = {0, 2, 3, 5, 5}};
-    LOG(getCombinations(board));
+    cout << getCombinations(board) << endl;
 
     return 0;
 }
