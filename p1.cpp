@@ -18,8 +18,10 @@ bool overlap(Tile &t1, Tile &t2) {
 
 int getMaxTileSize(Board &board) {
     vector<int> corners = board.corners;
-
     int tile_size = 0;
+
+    // Ignoring last index purposedly, since in the last
+    // index you can only fit a 1x1 square (height is 1)
     for (int i = 0; i < board.y; i++)
         if (board.y - i >= corners[i] && corners[i] > tile_size)
             tile_size = corners[i];
@@ -37,8 +39,8 @@ void getPossibleTiles(vector<Tile> &tiles, int size, Board &board) {
 
     for (int y = 0; board.y - y >= size; y++)
         for (int x = 0; corners[y] - x >= size; x++) {
-            Tile square = {.x = x, .y = y, .size = size};
-            tiles.push_back(square);
+            Tile tile = {.x = x, .y = y, .size = size};
+            tiles.push_back(tile);
         }
 }
 
@@ -148,6 +150,7 @@ void readInput(Board &board) {
         scanf("%d", &corner);
         board.corners.push_back(corner);
     }
+    board.corners.push_back(board.x); // The path always ends in the right wall of the board
 }
 
 int main() {
