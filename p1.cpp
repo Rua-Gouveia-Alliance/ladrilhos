@@ -142,6 +142,15 @@ int getCombinations(Board &board) {
 }
 
 void readInput(Board &board) {
+    cin >> board.y >> board.x;
+
+    int corner;
+    for (int i = 0; i < board.y; i++) {
+        cin >> corner;
+        board.corners.push_back(corner);
+    }
+    board.corners.push_back(board.x); // The path always ends in the right wall of the board
+/*
     scanf("%d", &board.y);
     scanf("%d", &board.x);
 
@@ -150,7 +159,7 @@ void readInput(Board &board) {
         scanf("%d", &corner);
         board.corners.push_back(corner);
     }
-    board.corners.push_back(board.x); // The path always ends in the right wall of the board
+    board.corners.push_back(board.x); // The path always ends in the right wall of the board */
 }
 
 int main() {
