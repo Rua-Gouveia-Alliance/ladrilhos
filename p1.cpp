@@ -5,15 +5,13 @@
 using namespace std;
 
 bool overlap(Tile &t1, Tile &t2) {
-    if (t1.x >= t2.x + t2.size)
-        return false;
-    if (t1.y >= t2.y + t2.size)
-        return false;
-    if (t1.x + t1.size <= t2.x)
-        return false;
-    if (t1.y + t1.size <= t2.y)
-        return false;
-    return true;
+    return (!(t1.x >= t2.x + t2.size) &&
+
+            !(t1.y >= t2.y + t2.size) &&
+
+            !(t1.x + t1.size <= t2.x) &&
+
+            !(t1.y + t1.size <= t2.y));
 }
 
 int getMaxTileSize(Board &board) {
