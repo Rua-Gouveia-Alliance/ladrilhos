@@ -150,16 +150,6 @@ void readInput(Board &board) {
         board.corners.push_back(corner);
     }
     board.corners.push_back(board.x); // The path always ends in the right wall of the board
-/*
-    scanf("%d", &board.y);
-    scanf("%d", &board.x);
-
-    int corner;
-    for (int i = 0; i < board.y; i++) {
-        scanf("%d", &corner);
-        board.corners.push_back(corner);
-    }
-    board.corners.push_back(board.x); // The path always ends in the right wall of the board */
 }
 
 int main() {
