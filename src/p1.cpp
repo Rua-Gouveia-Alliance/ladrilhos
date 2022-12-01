@@ -83,18 +83,18 @@ void removeDoubledCases(vector<Tile> &removed_tiles, vector<Tile> &tiles) {
             }
 }
 
-int cappedSizeCombinations(int tile_size, Board &board) {
-    int result = 1;
+unsigned long cappedSizeCombinations(int tile_size, Board &board) {
+    unsigned long result = 1;
 
     if (tile_size < 2 || board.x < 2 || board.y < 2)
         return result;
 
-    vector<Tile> tiles;
-    vector<Tile> removed_tiles;
-    Board bottom_board;
-    Board top_board;
-    Board side_board;
     do {
+        vector<Tile> tiles;
+        vector<Tile> removed_tiles;
+        Board bottom_board;
+        Board top_board;
+        Board side_board;
         getPossibleTiles(tiles, tile_size, board);
         removeDoubledCases(removed_tiles, tiles);
 
@@ -123,18 +123,12 @@ int cappedSizeCombinations(int tile_size, Board &board) {
                        cappedSizeCombinations(tile_size - 1, top_board) *
                        cappedSizeCombinations(tile_size - 1, side_board));
         }
-
-        tiles = vector<Tile>();
-        removed_tiles = vector<Tile>();
-        bottom_board = Board();
-        top_board = Board();
-        side_board = Board();
     } while (--tile_size > 1);
 
     return result;
 }
 
-int getCombinations(Board &board) {
+unsigned long getCombinations(Board &board) {
     int tile_size = getMaxTileSize(board);
     return cappedSizeCombinations(tile_size, board);
 }
