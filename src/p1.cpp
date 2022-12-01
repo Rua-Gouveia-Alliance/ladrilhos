@@ -86,7 +86,7 @@ void removeDoubledCases(vector<Tile> &removed_tiles, vector<Tile> &tiles) {
 int cappedSizeCombinations(int tile_size, Board &board) {
     int result = 1;
 
-    if (tile_size == 1 || tile_size == 0)
+    if (tile_size < 2 || board.x < 2 || board.y < 2)
         return result;
 
     vector<Tile> tiles;

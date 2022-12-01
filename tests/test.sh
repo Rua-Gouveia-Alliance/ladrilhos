@@ -37,7 +37,7 @@ while getopts :b:t:h FLAG; do
 done
 
 # Default values if a flag is not provided
-[ "$BIN" = "" ] && BIN="bin/p1"
+[ "$BIN" = "" ] && BIN="../bin/p1"
 [ "$TESTDIR" = "" ] && TESTDIR="public_tests"
 
 # Checking if files exist
