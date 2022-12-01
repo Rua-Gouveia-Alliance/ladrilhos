@@ -89,12 +89,14 @@ unsigned long cappedSizeCombinations(int tile_size, Board &board) {
     if (tile_size < 2 || board.x < 2 || board.y < 2)
         return result;
 
+    vector<Tile> tiles;
+    vector<Tile> removed_tiles;
+    Board bottom_board;
+    Board top_board;
+    Board side_board;
     do {
-        vector<Tile> tiles;
-        vector<Tile> removed_tiles;
-        Board bottom_board;
-        Board top_board;
-        Board side_board;
+        tiles = vector<Tile>();
+        removed_tiles = vector<Tile>(); 
         getPossibleTiles(tiles, tile_size, board);
         removeDoubledCases(removed_tiles, tiles);
 
