@@ -1,8 +1,20 @@
-#include "structs.h"
+#include <vector>
 #include <iostream>
 #include <list>
 
 using namespace std;
+
+typedef struct {
+    int x;
+    int y;
+    std::vector<int> corners;
+} Board;
+
+typedef struct {
+    int x;
+    int y;
+    int size;
+} Tile;
 
 bool overlap(Tile &t1, Tile &t2) {
     return (!(t1.x >= t2.x + t2.size) &&
