@@ -44,7 +44,7 @@ int getMaxTileSize(Board &board) {
 void getPossibleTiles(vector<Tile> &tiles, int size, Board &board) {
     vector<int> corners = board.corners;
 
-    if (size > board.y || size > board.x || size == 0)
+    if (size > board.y || size > board.x || size <= 0)
         return;
 
     for (int y = 0; board.y - y >= size; y++)
@@ -57,15 +57,20 @@ void getPossibleTiles(vector<Tile> &tiles, int size, Board &board) {
 void getBottomBoard(Board &result, Tile &tile, Board &board) {
     result.x = tile.x + tile.size;
     result.y = board.y - tile.y;
-    int corner_x = tile.x;
+
+    if (result.x < 2 || result.y < 2)
+        return;
 
     for (int i = 0; i <= result.y; i++)
-        result.corners.push_back(i < tile.size ? corner_x : result.x);
+        result.corners.push_back(i < tile.size ? tile.x : result.x);
 }
 
 void getTopBoard(Board &result, Tile &tile, Board &board) {
     result.x = tile.x + tile.size;
     result.y = tile.y;
+
+    if (result.x < 2 || result.y < 2)
+        return;
 
     for (int i = 0; i <= result.y; i++)
         result.corners.push_back(
@@ -76,6 +81,9 @@ void getSideBoard(Board &result, Tile &tile, Board &board) {
     int offset = tile.size + tile.x;
     result.x = board.x - offset;
     result.y = board.y;
+
+    if (result.x < 2 || result.y < 2)
+        return;
 
     int corner;
     for (int i = 0; i <= result.y; i++) {
@@ -112,7 +120,7 @@ unsigned long cappedSizeCombinations(int tile_size, Board &board) {
         getPossibleTiles(tiles, tile_size, board);
         removeDoubledCases(removed_tiles, tiles);
 
-        // for the normal tiles
+        // normal tiles
         for (Tile &tile : tiles) {
             bottom_board = Board();
             top_board = Board();
@@ -125,7 +133,7 @@ unsigned long cappedSizeCombinations(int tile_size, Board &board) {
                        cappedSizeCombinations(tile_size, side_board));
         }
 
-        // for the removed tiles
+        // removed tiles
         for (Tile &tile : removed_tiles) {
             bottom_board = Board();
             top_board = Board();
