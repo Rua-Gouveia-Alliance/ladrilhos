@@ -7,7 +7,7 @@ using namespace std;
 typedef struct {
     int x;
     int y;
-    std::vector<int> corners;
+    vector<int> corners;
 } Board;
 
 typedef struct {
@@ -17,21 +17,19 @@ typedef struct {
 } Tile;
 
 bool overlap(Tile &t1, Tile &t2) {
-    return (!(t1.x >= t2.x + t2.size) &&
+    if (t1.x > t2.x + t2.size - 1 || t2.x > t1.x + t1.size - 1)
+        return false;
 
-            !(t1.y >= t2.y + t2.size) &&
+    if (t1.y + t1.size - 1 < t2.y || t2.y + t2.size - 1 < t1.y)
+        return false;
 
-            !(t1.x + t1.size <= t2.x) &&
-
-            !(t1.y + t1.size <= t2.y));
+    return true;
 }
 
 int getMaxTileSize(Board &board) {
     vector<int> corners = board.corners;
     int tile_size = 0;
 
-    // Ignoring last index purposedly, since in the last
-    // index you can only fit a 1x1 square (height is 1)
     for (int i = 0; i < board.y; i++)
         if (board.y - i >= corners[i] && corners[i] > tile_size)
             tile_size = corners[i];
@@ -92,14 +90,22 @@ void getSideBoard(Board &result, Tile &tile, Board &board) {
     }
 }
 
+bool notIncludedOtherBoards(Tile tile1, Tile tile2) {
+    return (tile2.x < tile1.x + tile1.size && tile2.x + tile2.size > tile1.x + tile1.size) ||
+        (tile2.y < tile1.y && tile2.y + tile2.size > tile1.y && tile2.x < tile1.x);
+}
+
 void removeDoubledCases(vector<Tile> &removed_tiles, vector<Tile> &tiles) {
     int size = tiles.size();
     for (int i = 0; i < size; i++)
-        for (int j = 0; j < size; j++)
-            if (!overlap(tiles[i], tiles[j])) {
+        for (int j = i+1; j < size; j++)
+            if (!overlap(tiles[i], tiles[j]) && !notIncludedOtherBoards(tiles[i], tiles[j])) {
                 removed_tiles.push_back(tiles[j]);
                 tiles.erase(tiles.begin() + j);
                 size--;
+                j--;
+                if(i > j)
+                    i--;
             }
 }
 
@@ -152,6 +158,9 @@ unsigned long cappedSizeCombinations(int tile_size, Board &board) {
 
 unsigned long getCombinations(Board &board) {
     int tile_size = getMaxTileSize(board);
+    if (!tile_size)
+        return 0;
+
     return cappedSizeCombinations(tile_size, board);
 }
 
@@ -163,7 +172,6 @@ void readInput(Board &board) {
         cin >> corner;
         board.corners.push_back(corner);
     }
-    board.corners.push_back(board.x); // The path always ends in the right wall of the board
 }
 
 int main() {
