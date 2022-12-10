@@ -2,176 +2,114 @@
 #include <iostream>
 #include <list>
 
-using namespace std;
-
 typedef struct {
     int x;
     int y;
     std::vector<int> corners;
 } Board;
 
-typedef struct {
-    int x;
-    int y;
-    int size;
-} Tile;
-
-bool overlap(Tile &t1, Tile &t2) {
-    return (!(t1.x >= t2.x + t2.size) &&
-
-            !(t1.y >= t2.y + t2.size) &&
-
-            !(t1.x + t1.size <= t2.x) &&
-
-            !(t1.y + t1.size <= t2.y));
-}
-
-int getMaxTileSize(Board &board) {
-    vector<int> corners = board.corners;
+int get_max_tile_size(Board &board) {
+    std::vector<int> corners = board.corners;
     int tile_size = 0;
 
-    // Ignoring last index purposedly, since in the last
-    // index you can only fit a 1x1 square (height is 1)
-    for (int i = 0; i < board.y; i++)
-        if (board.y - i >= corners[i] && corners[i] > tile_size)
+    for (int i = 0; i < board.y; i++) {
+        if (board.y - i >= corners[i] && corners[i] > tile_size) {
             tile_size = corners[i];
-        else if (corners[i] >= board.y - i && board.y - i > tile_size)
+            if (tile_size > 1)
+                return tile_size;
+        }
+        else if (corners[i] >= board.y - i && board.y - i > tile_size) {
             tile_size = board.y - i;
+            if (tile_size > 1)
+                return tile_size;
+        }
+    }
 
     return tile_size;
 }
 
-void getPossibleTiles(vector<Tile> &tiles, int size, Board &board) {
-    vector<int> corners = board.corners;
-
-    if (size > board.y || size > board.x || size <= 0)
-        return;
-
-    for (int y = 0; board.y - y >= size; y++)
-        for (int x = 0; corners[y] - x >= size; x++) {
-            Tile tile = {.x = x, .y = y, .size = size};
-            tiles.push_back(tile);
+void get_parents(std::vector<Board> &parents, Board &board) {
+    if (board.corners[0] > 0) {
+        std::vector<int> corners(board.corners);
+        Board parent = {.x = board.x, .y = board.y, .corners = corners};
+        parent.corners[0]--;
+        parents.push_back(parent);
+    }
+    for (int i = 1; i < board.y; i++) {
+        if (board.corners[i] > 0 && board.corners[i-1] < board.corners[i]) {
+            std::vector<int> corners(board.corners);
+            Board parent = {.x = board.x, .y = board.y, .corners = corners};
+            parent.corners[i]--;
+            parents.push_back(parent);
         }
-}
-
-void getBottomBoard(Board &result, Tile &tile, Board &board) {
-    result.x = tile.x + tile.size;
-    result.y = board.y - tile.y;
-
-    if (result.x < 2 || result.y < 2)
-        return;
-
-    for (int i = 0; i <= result.y; i++)
-        result.corners.push_back(i < tile.size ? tile.x : result.x);
-}
-
-void getTopBoard(Board &result, Tile &tile, Board &board) {
-    result.x = tile.x + tile.size;
-    result.y = tile.y;
-
-    if (result.x < 2 || result.y < 2)
-        return;
-
-    for (int i = 0; i <= result.y; i++)
-        result.corners.push_back(
-            board.corners[i] > result.x ? result.x : board.corners[i]);
-}
-
-void getSideBoard(Board &result, Tile &tile, Board &board) {
-    int offset = tile.size + tile.x;
-    result.x = board.x - offset;
-    result.y = board.y;
-
-    if (result.x < 2 || result.y < 2)
-        return;
-
-    int corner;
-    for (int i = 0; i <= result.y; i++) {
-        corner = board.corners[i] - offset;
-        result.corners.push_back(corner < 0 ? 0 : corner);
     }
 }
 
-void removeDoubledCases(vector<Tile> &removed_tiles, vector<Tile> &tiles) {
-    int size = tiles.size();
-    for (int i = 0; i < size; i++)
-        for (int j = 0; j < size; j++)
-            if (!overlap(tiles[i], tiles[j])) {
-                removed_tiles.push_back(tiles[j]);
-                tiles.erase(tiles.begin() + j);
-                size--;
-            }
+void get_common_board(Board &board, std::vector<Board> &boards) {
+    int min, count = boards.size();
+    board = {.x = board.x, .y = board.y};
+    
+    for (int i = 0; i < board.y; i++) {
+        min = boards[0].corners[i];
+        for (int j = 0; j < count; j++)
+            if(boards[j].corners[i] < min)
+                min = boards[j].corners[i];
+        board.corners.push_back(min);
+    }
 }
 
-unsigned long cappedSizeCombinations(int tile_size, Board &board) {
-    unsigned long result = 1;
+unsigned long int get_combinations(Board &board) {
+    int tile_size = get_max_tile_size(board);
 
-    if (tile_size < 2 || board.x < 2 || board.y < 2)
-        return result;
+    if (tile_size == 0)
+        return 0;
+    if (tile_size == 1)
+        return 1;
 
-    vector<Tile> tiles;
-    vector<Tile> removed_tiles;
-    Board bottom_board;
-    Board top_board;
-    Board side_board;
-    do {
-        tiles = vector<Tile>();
-        removed_tiles = vector<Tile>(); 
-        getPossibleTiles(tiles, tile_size, board);
-        removeDoubledCases(removed_tiles, tiles);
+    int answer = 0;
+    std::vector<Board> parents;
+    get_parents(parents, board);
+    for (auto & p : parents)
+        answer += get_combinations(p);
+    
+    if (parents.size() > 1) {
+        Board common_board = Board();
+        get_common_board(common_board, parents);
+        answer -= get_combinations(common_board);
+    }
 
-        // normal tiles
-        for (Tile &tile : tiles) {
-            bottom_board = Board();
-            top_board = Board();
-            side_board = Board();
-            getBottomBoard(bottom_board, tile, board);
-            getTopBoard(top_board, tile, board);
-            getSideBoard(side_board, tile, board);
-            result += (cappedSizeCombinations(tile_size, bottom_board) *
-                       cappedSizeCombinations(tile_size, top_board) *
-                       cappedSizeCombinations(tile_size, side_board));
-        }
-
-        // removed tiles
-        for (Tile &tile : removed_tiles) {
-            bottom_board = Board();
-            top_board = Board();
-            side_board = Board();
-            getBottomBoard(bottom_board, tile, board);
-            getTopBoard(top_board, tile, board);
-            getSideBoard(side_board, tile, board);
-            result += (cappedSizeCombinations(tile_size - 1, bottom_board) *
-                       cappedSizeCombinations(tile_size - 1, top_board) *
-                       cappedSizeCombinations(tile_size - 1, side_board));
-        }
-    } while (--tile_size > 1);
-
-    return result;
+    return answer;
 }
 
-unsigned long getCombinations(Board &board) {
-    int tile_size = getMaxTileSize(board);
-    return cappedSizeCombinations(tile_size, board);
+void print_board(Board board) {
+    std::cout << "X:" << board.x << " Y: " << board.y << std::endl;
+    for (const auto & c : board.corners)
+        std::cout << c << std::endl;
 }
 
-void readInput(Board &board) {
-    cin >> board.y >> board.x;
+void read_input(Board &board) {
+    std::cin >> board.y >> board.x;
 
     int corner;
     for (int i = 0; i < board.y; i++) {
-        cin >> corner;
+        std::cin >> corner;
         board.corners.push_back(corner);
     }
-    board.corners.push_back(board.x); // The path always ends in the right wall of the board
 }
 
 int main() {
     // Create board and read input
     Board board;
-    readInput(board);
+    read_input(board);
+    
+    std::vector<Board> vector;
+    get_parents(vector, board);
+/*
+    for (const auto & p : vector)
+        print_board(p);
+    */
 
-    cout << getCombinations(board) << endl;
+    std::cout << get_combinations(board) << std::endl;
 
     return 0;
 }
