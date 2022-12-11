@@ -100,13 +100,17 @@ void place_rightmost_tile(std::vector<Board*>& result, Board* board) {
 unsigned long int get_combinations(Board* board, std::unordered_map<unsigned long int, Cell>& table) {
     int size = get_max_tile_size(board);
 
-    if (size < 2)
+    if (size < 2) {
+        delete board;
         return 1;
+    }
     
     unsigned long int board_id = hash(board);
     if(table.find(board_id) != table.end())
-        if (equal_boards(board, table[board_id].board))
+        if (equal_boards(board, table[board_id].board)) {
+            delete board;
             return table[board_id].combinations;
+        }
     
     unsigned long int answer = 0;
     std::vector<Board*> children = std::vector<Board*>();
