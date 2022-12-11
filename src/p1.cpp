@@ -28,57 +28,65 @@ int get_max_tile_size(Board &board) {
     return tile_size;
 }
 
-void get_parents(std::vector<Board> &parents, Board &board) {
-    if (board.corners[0] > 0) {
-        std::vector<int> corners(board.corners);
-        Board parent = {.x = board.x, .y = board.y, .corners = corners};
-        parent.corners[0]--;
-        parents.push_back(parent);
-    }
-    for (int i = 1; i < board.y; i++) {
-        if (board.corners[i] > 0 && board.corners[i-1] < board.corners[i]) {
-            std::vector<int> corners(board.corners);
-            Board parent = {.x = board.x, .y = board.y, .corners = corners};
-            parent.corners[i]--;
-            parents.push_back(parent);
+void place_rightmost_tile(std::vector<Board>& result, Board& board) {
+    int max = 0;
+    result.clear();
+    for (int i = 0; i < board.y; i++)
+        if (board.corners[i] > board.corners[max])
+            max = i;
+    
+    int tile_size = 0;
+    if (board.y - max >= board.corners[max] && board.corners[max] > tile_size)
+        tile_size = board.corners[max];
+    if (board.corners[max] >= board.y - max && board.y - max > tile_size)
+        tile_size = board.y - max;
+
+    for (int i = 0; i < tile_size; i++) {
+        if (board.corners[max + i] < board.corners[max]) {
+            tile_size = i;
+            break;
         }
     }
-}
 
-void get_common_board(Board &board, std::vector<Board> &boards) {
-    int min, count = boards.size();
-    board = {.x = board.x, .y = board.y};
+    if (tile_size == 0) return;
+
+    do {
+        std::vector<int> corners(board.corners);
+        Board new_board = {.x = board.x, .y = board.y, .corners = corners};
+        
+        for (int i = 0; i < tile_size; i++)
+           new_board.corners[max+i] -= tile_size;
+        
+        result.push_back(new_board);
+
+    } while (--tile_size > 0);
     
-    for (int i = 0; i < board.y; i++) {
-        min = boards[0].corners[i];
-        for (int j = 0; j < count; j++)
-            if(boards[j].corners[i] < min)
-                min = boards[j].corners[i];
-        board.corners.push_back(min);
-    }
+    
 }
 
 unsigned long int get_combinations(Board &board) {
-    int tile_size = get_max_tile_size(board);
+    int size = get_max_tile_size(board);
 
-    if (tile_size == 0)
-        return 0;
-    if (tile_size == 1)
+    if (size < 2)
         return 1;
-
-    int answer = 0;
-    std::vector<Board> parents;
-    get_parents(parents, board);
-    for (auto & p : parents)
-        answer += get_combinations(p);
     
-    if (parents.size() > 1) {
-        Board common_board = Board();
-        get_common_board(common_board, parents);
-        answer -= get_combinations(common_board);
-    }
+    unsigned long int answer = 0;
+    std::vector<Board> children = std::vector<Board>();
+    place_rightmost_tile(children, board);
+    
+    for (auto &b : children)
+        answer += get_combinations(b);
 
     return answer;
+}
+
+unsigned long int compute_board(Board &board) {
+    int size = get_max_tile_size(board);
+
+    if (size < 2)
+        return size;
+    
+    return get_combinations(board);
 }
 
 void print_board(Board board) {
@@ -102,14 +110,7 @@ int main() {
     Board board;
     read_input(board);
     
-    std::vector<Board> vector;
-    get_parents(vector, board);
-/*
-    for (const auto & p : vector)
-        print_board(p);
-    */
-
-    std::cout << get_combinations(board) << std::endl;
+    std::cout << compute_board(board) << std::endl;
 
     return 0;
 }
