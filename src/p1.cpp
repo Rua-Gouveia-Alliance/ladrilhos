@@ -118,7 +118,7 @@ void removeDoubledCases(vector<Tile> &tiles) {
     for (int i = 0; i < size; i++) {
         tiles[i].conflicts = vector<Tile>();
         for (int j = i+1; j < size; j++)
-            if (!overlap(tiles[i], tiles[j]) && !notIncludedOtherBoards(tiles[i], tiles[j]) && !notIncludedOtherBoards(tiles[j], tiles[i])) {
+            if (!overlap(tiles[i], tiles[j]) && !notIncludedOtherBoards(tiles[j], tiles[i])) {
                 tiles[i].conflicts.push_back(tiles[j]);
             }
     }
