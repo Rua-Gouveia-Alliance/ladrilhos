@@ -3,7 +3,6 @@
 #include <iostream>
 
 typedef struct {
-    int x;
     int y;
     std::vector<int> corners;
 } Board;
@@ -29,7 +28,7 @@ unsigned long int hash(Board* board) {
 
 bool equal_boards(Board* board1, Board* board2) {
 
-    if (board1->x != board2->x || board1->y != board2->y)
+    if (board1->y != board2->y)
         return false;
 
     for (int i = 0; i < board1->y; i++)
@@ -83,7 +82,6 @@ void place_rightmost_tile(std::vector<Board*>& result, Board* board) {
     do {
         std::vector<int> corners(board->corners);
         Board* new_board = new Board();
-        new_board->x = board->x;
         new_board->y = board->y;
         new_board->corners = corners;
         
@@ -135,8 +133,9 @@ unsigned long int compute_board(Board* board, std::unordered_map<unsigned long i
 }
 
 Board* read_input() {
+    int throw_away;
     Board* board = new Board();
-    std::cin >> board->y >> board->x;
+    std::cin >> board->y >> throw_away;
 
     int corner;
     for (int i = 0; i < board->y; i++) {
