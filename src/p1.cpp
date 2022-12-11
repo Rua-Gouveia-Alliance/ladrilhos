@@ -10,10 +10,11 @@ typedef struct {
     vector<int> corners;
 } Board;
 
-typedef struct {
+typedef struct Tile {
     int x;
     int y;
     int size;
+    vector<struct Tile> conflicts;
 } Tile;
 
 bool overlap(Tile &t1, Tile &t2) {
@@ -39,8 +40,9 @@ int getMaxTileSize(Board &board) {
     return tile_size;
 }
 
-void getPossibleTiles(vector<Tile> &tiles, int size, Board &board) {
+void getPossibleTiles(vector<Tile> &tiles, int size, Board &board, vector<Tile> &conflicts) {
     vector<int> corners = board.corners;
+    bool conflict;
 
     if (size > board.y || size > board.x || size <= 0)
         return;
@@ -48,7 +50,15 @@ void getPossibleTiles(vector<Tile> &tiles, int size, Board &board) {
     for (int y = 0; board.y - y >= size; y++)
         for (int x = 0; corners[y] - x >= size; x++) {
             Tile tile = {.x = x, .y = y, .size = size};
-            tiles.push_back(tile);
+            conflict = false; 
+            for (Tile t : conflicts) {
+                if (t.x == tile.x && t.y == tile.y && t.size == tile.size) {
+                    conflict = true;
+                    break;
+                }
+            }
+            if (!conflict)
+                tiles.push_back(tile);
         }
 }
 
@@ -61,6 +71,9 @@ void getBottomBoard(Board &result, Tile &tile, Board &board) {
 
     for (int i = 0; i <= result.y; i++)
         result.corners.push_back(i < tile.size ? tile.x : result.x);
+
+    for (int i = 0; i < tile.conflicts.size(); i++)
+        tile.conflicts[i].y -= tile.y;
 }
 
 void getTopBoard(Board &result, Tile &tile, Board &board) {
@@ -73,6 +86,7 @@ void getTopBoard(Board &result, Tile &tile, Board &board) {
     for (int i = 0; i <= result.y; i++)
         result.corners.push_back(
             board.corners[i] > result.x ? result.x : board.corners[i]);
+
 }
 
 void getSideBoard(Board &result, Tile &tile, Board &board) {
@@ -88,68 +102,64 @@ void getSideBoard(Board &result, Tile &tile, Board &board) {
         corner = board.corners[i] - offset;
         result.corners.push_back(corner < 0 ? 0 : corner);
     }
+
+    for (int i = 0; i < tile.conflicts.size(); i++)
+        tile.conflicts[i].x -= offset;
 }
 
-bool notIncludedOtherBoards(Tile tile1, Tile tile2) {
+bool notIncludedOtherBoards(Tile &tile1, Tile &tile2) {
     return (tile2.x < tile1.x + tile1.size && tile2.x + tile2.size > tile1.x + tile1.size) ||
         (tile2.y < tile1.y && tile2.y + tile2.size > tile1.y && tile2.x < tile1.x);
 }
 
-void removeDoubledCases(vector<Tile> &removed_tiles, vector<Tile> &tiles) {
+void removeDoubledCases(vector<Tile> &tiles) {
     int size = tiles.size();
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++) {
+        tiles[i].conflicts = vector<Tile>();
         for (int j = i+1; j < size; j++)
             if (!overlap(tiles[i], tiles[j]) && !notIncludedOtherBoards(tiles[i], tiles[j])) {
-                removed_tiles.push_back(tiles[j]);
-                tiles.erase(tiles.begin() + j);
-                size--;
-                j--;
-                if(i > j)
-                    i--;
+                tiles[i].conflicts.push_back(tiles[j]);
             }
+    }
 }
 
-unsigned long cappedSizeCombinations(int tile_size, Board &board) {
+unsigned long cappedSizeCombinations(int tile_size, Board &board, vector<Tile> &conflicts) {
     unsigned long result = 1;
 
     if (tile_size < 2 || board.x < 2 || board.y < 2)
         return result;
 
     vector<Tile> tiles;
-    vector<Tile> removed_tiles;
     Board bottom_board;
     Board top_board;
     Board side_board;
+    vector<Tile> cache;
+    unsigned long num_cache;
     do {
         tiles = vector<Tile>();
-        removed_tiles = vector<Tile>(); 
-        getPossibleTiles(tiles, tile_size, board);
-        removeDoubledCases(removed_tiles, tiles);
+        getPossibleTiles(tiles, tile_size, board, conflicts);
+        removeDoubledCases(tiles);
 
         // normal tiles
         for (Tile &tile : tiles) {
             bottom_board = Board();
             top_board = Board();
             side_board = Board();
-            getBottomBoard(bottom_board, tile, board);
-            getTopBoard(top_board, tile, board);
-            getSideBoard(side_board, tile, board);
-            result += (cappedSizeCombinations(tile_size, bottom_board) *
-                       cappedSizeCombinations(tile_size, top_board) *
-                       cappedSizeCombinations(tile_size, side_board));
-        }
 
-        // removed tiles
-        for (Tile &tile : removed_tiles) {
-            bottom_board = Board();
-            top_board = Board();
-            side_board = Board();
+            cache = tile.conflicts;
+
             getBottomBoard(bottom_board, tile, board);
+            num_cache = cappedSizeCombinations(tile_size, bottom_board, tile.conflicts);
+
+            tile.conflicts = cache;
             getTopBoard(top_board, tile, board);
+            num_cache *= cappedSizeCombinations(tile_size, top_board, tile.conflicts);
+
+            tile.conflicts = cache;
             getSideBoard(side_board, tile, board);
-            result += (cappedSizeCombinations(tile_size - 1, bottom_board) *
-                       cappedSizeCombinations(tile_size - 1, top_board) *
-                       cappedSizeCombinations(tile_size - 1, side_board));
+            num_cache *= cappedSizeCombinations(tile_size, side_board, tile.conflicts);
+
+            result += num_cache;
         }
     } while (--tile_size > 1);
 
@@ -161,7 +171,8 @@ unsigned long getCombinations(Board &board) {
     if (!tile_size)
         return 0;
 
-    return cappedSizeCombinations(tile_size, board);
+    vector<Tile> conflicts;
+    return cappedSizeCombinations(tile_size, board, conflicts);
 }
 
 void readInput(Board &board) {
