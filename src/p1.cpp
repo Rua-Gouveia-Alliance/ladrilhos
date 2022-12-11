@@ -136,6 +136,7 @@ Board* read_input() {
     int throw_away;
     Board* board = new Board();
     std::cin >> board->y >> throw_away;
+    // The x size wont ever be used
 
     int corner;
     for (int i = 0; i < board->y; i++) {
