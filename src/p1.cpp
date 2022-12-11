@@ -9,7 +9,7 @@ typedef struct {
 } Board;
 
 typedef struct {
-    Board board;
+    Board* board;
     unsigned long int combinations;
 } Cell;
 
@@ -20,37 +20,37 @@ unsigned int hash_corner(unsigned int x) {
     return x;
 }
 
-unsigned long int hash(Board board) {
+unsigned long int hash(Board* board) {
     int hash = 0;
-    for (const auto & i : board.corners)
+    for (const auto & i : board->corners)
         hash = 31 * hash + hash_corner(i);
     return hash;
 }
 
-bool equal_boards(Board& board1, Board& board2) {
+bool equal_boards(Board* board1, Board* board2) {
 
-    if (board1.x != board2.x || board1.y != board2.y)
+    if (board1->x != board2->x || board1->y != board2->y)
         return false;
 
-    for (int i = 0; i < board1.y; i++)
-        if(board1.corners[i] != board2.corners[i])
+    for (int i = 0; i < board1->y; i++)
+        if(board1->corners[i] != board2->corners[i])
             return false;
 
     return true;
 }
 
-int get_max_tile_size(Board &board) {
-    std::vector<int> corners = board.corners;
+int get_max_tile_size(Board* board) {
+    std::vector<int> corners = board->corners;
     int tile_size = 0;
 
-    for (int i = 0; i < board.y; i++) {
-        if (board.y - i >= corners[i] && corners[i] > tile_size) {
+    for (int i = 0; i < board->y; i++) {
+        if (board->y - i >= corners[i] && corners[i] > tile_size) {
             tile_size = corners[i];
             if (tile_size > 1)
                 return tile_size;
         }
-        else if (corners[i] >= board.y - i && board.y - i > tile_size) {
-            tile_size = board.y - i;
+        else if (corners[i] >= board->y - i && board->y - i > tile_size) {
+            tile_size = board->y - i;
             if (tile_size > 1)
                 return tile_size;
         }
@@ -59,20 +59,20 @@ int get_max_tile_size(Board &board) {
     return tile_size;
 }
 
-void place_rightmost_tile(std::vector<Board>& result, Board& board) {
+void place_rightmost_tile(std::vector<Board*>& result, Board* board) {
     int max = 0;
-    for (int i = 0; i < board.y; i++)
-        if (board.corners[i] > board.corners[max])
+    for (int i = 0; i < board->y; i++)
+        if (board->corners[i] > board->corners[max])
             max = i;
     
     int tile_size = 0;
-    if (board.y - max >= board.corners[max] && board.corners[max] > tile_size)
-        tile_size = board.corners[max];
-    if (board.corners[max] >= board.y - max && board.y - max > tile_size)
-        tile_size = board.y - max;
+    if (board->y - max >= board->corners[max] && board->corners[max] > tile_size)
+        tile_size = board->corners[max];
+    if (board->corners[max] >= board->y - max && board->y - max > tile_size)
+        tile_size = board->y - max;
 
     for (int i = 0; i < tile_size; i++) {
-        if (board.corners[max + i] < board.corners[max]) {
+        if (board->corners[max + i] < board->corners[max]) {
             tile_size = i;
             break;
         }
@@ -81,11 +81,14 @@ void place_rightmost_tile(std::vector<Board>& result, Board& board) {
     if (tile_size == 0) return;
 
     do {
-        std::vector<int> corners(board.corners);
-        Board new_board = {.x = board.x, .y = board.y, .corners = corners};
+        std::vector<int> corners(board->corners);
+        Board* new_board = new Board();
+        new_board->x = board->x;
+        new_board->y = board->y;
+        new_board->corners = corners;
         
         for (int i = 0; i < tile_size; i++)
-           new_board.corners[max+i] -= tile_size;
+           new_board->corners[max+i] -= tile_size;
         
         result.push_back(new_board);
 
@@ -94,7 +97,7 @@ void place_rightmost_tile(std::vector<Board>& result, Board& board) {
     
 }
 
-unsigned long int get_combinations(Board &board, std::unordered_map<unsigned long int, Cell>& table) {
+unsigned long int get_combinations(Board* board, std::unordered_map<unsigned long int, Cell>& table) {
     int size = get_max_tile_size(board);
 
     if (size < 2)
@@ -106,7 +109,7 @@ unsigned long int get_combinations(Board &board, std::unordered_map<unsigned lon
             return table[board_id].combinations;
     
     unsigned long int answer = 0;
-    std::vector<Board> children = std::vector<Board>();
+    std::vector<Board*> children = std::vector<Board*>();
     place_rightmost_tile(children, board);
     
     for (auto &b : children)
@@ -118,7 +121,7 @@ unsigned long int get_combinations(Board &board, std::unordered_map<unsigned lon
     return answer;
 }
 
-unsigned long int compute_board(Board &board, std::unordered_map<unsigned long int, Cell>& table) {
+unsigned long int compute_board(Board* board, std::unordered_map<unsigned long int, Cell>& table) {
     int size = get_max_tile_size(board);
 
     if (size < 2)
@@ -127,24 +130,28 @@ unsigned long int compute_board(Board &board, std::unordered_map<unsigned long i
     return get_combinations(board, table);
 }
 
-void read_input(Board &board) {
-    std::cin >> board.y >> board.x;
+Board* read_input() {
+    Board* board = new Board();
+    std::cin >> board->y >> board->x;
 
     int corner;
-    for (int i = 0; i < board.y; i++) {
+    for (int i = 0; i < board->y; i++) {
         std::cin >> corner;
-        board.corners.push_back(corner);
+        board->corners.push_back(corner);
     }
+    return board;
 }
 
 int main() {
     // Create board and read input
-    Board board;
-    read_input(board);
+    Board* board = read_input();
     
     std::unordered_map<unsigned long int, Cell> map;
     
     std::cout << compute_board(board, map) << std::endl;
+    
+    for (auto &e : map)
+        delete e.second.board;
 
     return 0;
 }
