@@ -57,9 +57,10 @@ void getPossibleTiles(vector<Tile> &tiles, int size, Board &board, vector<Tile> 
                     break;
                 }
             }
-            if (!conflict)
+            if (!conflict) {
                 tiles.push_back(tile);
-        }
+            }
+    }
 }
 
 void getBottomBoard(Board &result, Tile &tile, Board &board) {
@@ -72,8 +73,8 @@ void getBottomBoard(Board &result, Tile &tile, Board &board) {
     for (int i = 0; i <= result.y; i++)
         result.corners.push_back(i < tile.size ? tile.x : result.x);
 
-    for (int i = 0; i < tile.conflicts.size(); i++)
-        tile.conflicts[i].y -= tile.y;
+    for (auto &t : tile.conflicts)
+        t.y -= tile.y;
 }
 
 void getTopBoard(Board &result, Tile &tile, Board &board) {
@@ -103,8 +104,8 @@ void getSideBoard(Board &result, Tile &tile, Board &board) {
         result.corners.push_back(corner < 0 ? 0 : corner);
     }
 
-    for (int i = 0; i < tile.conflicts.size(); i++)
-        tile.conflicts[i].x -= offset;
+    for (auto &t : tile.conflicts)
+        t.x -= offset;
 }
 
 bool notIncludedOtherBoards(Tile &tile1, Tile &tile2) {
@@ -117,7 +118,7 @@ void removeDoubledCases(vector<Tile> &tiles) {
     for (int i = 0; i < size; i++) {
         tiles[i].conflicts = vector<Tile>();
         for (int j = i+1; j < size; j++)
-            if (!overlap(tiles[i], tiles[j]) && !notIncludedOtherBoards(tiles[i], tiles[j])) {
+            if (!overlap(tiles[i], tiles[j]) && !notIncludedOtherBoards(tiles[i], tiles[j]) && !notIncludedOtherBoards(tiles[j], tiles[i])) {
                 tiles[i].conflicts.push_back(tiles[j]);
             }
     }
