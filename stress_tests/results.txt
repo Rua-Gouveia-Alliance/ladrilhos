@@ -1,97 +1,97 @@
 
 5x4
 
-real	0m0.001s
-user	0m0.001s
+real	0m0.002s
+user	0m0.002s
 sys	0m0.000s
 
 5x5
 
-real	0m0.001s
-user	0m0.001s
-sys	0m0.000s
+real	0m0.002s
+user	0m0.000s
+sys	0m0.002s
 
 6x5
 
-real	0m0.001s
+real	0m0.002s
 user	0m0.000s
-sys	0m0.001s
+sys	0m0.002s
 
 6x6
-
-real	0m0.001s
-user	0m0.001s
-sys	0m0.000s
-
-7x6
-
-real	0m0.003s
-user	0m0.003s
-sys	0m0.000s
-
-7x7
-
-real	0m0.004s
-user	0m0.000s
-sys	0m0.003s
-
-8x7
 
 real	0m0.002s
 user	0m0.002s
 sys	0m0.000s
 
+7x6
+
+real	0m0.002s
+user	0m0.002s
+sys	0m0.000s
+
+7x7
+
+real	0m0.002s
+user	0m0.002s
+sys	0m0.000s
+
+8x7
+
+real	0m0.003s
+user	0m0.003s
+sys	0m0.000s
+
 8x8
 
-real	0m0.004s
-user	0m0.004s
+real	0m0.003s
+user	0m0.003s
 sys	0m0.000s
 
 9x8
 
-real	0m0.004s
-user	0m0.000s
-sys	0m0.004s
+real	0m0.006s
+user	0m0.003s
+sys	0m0.003s
 
 9x9
 
-real	0m0.004s
-user	0m0.004s
+real	0m0.007s
+user	0m0.007s
 sys	0m0.000s
 
 10x9
 
-real	0m0.005s
-user	0m0.002s
-sys	0m0.002s
+real	0m0.013s
+user	0m0.013s
+sys	0m0.000s
 
 10x10
 
-real	0m0.004s
-user	0m0.005s
+real	0m0.015s
+user	0m0.015s
 sys	0m0.000s
 
 11x10
 
-real	0m0.006s
-user	0m0.006s
-sys	0m0.000s
+real	0m0.039s
+user	0m0.035s
+sys	0m0.003s
 
 11x11
 
-real	0m0.005s
-user	0m0.005s
-sys	0m0.000s
+real	0m0.034s
+user	0m0.031s
+sys	0m0.003s
 
 12x11
 
-real	0m0.008s
-user	0m0.003s
-sys	0m0.005s
+real	0m0.099s
+user	0m0.091s
+sys	0m0.007s
 
 12x12
 
-real	0m0.004s
-user	0m0.000s
-sys	0m0.004s
+real	0m0.114s
+user	0m0.100s
+sys	0m0.013s
 
