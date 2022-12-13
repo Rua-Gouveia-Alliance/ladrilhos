@@ -1,3 +1,13 @@
+# ladrilhos
+
+Project done in the scope of the course Analysis and Synthesis of Algorithms, IST 2022/2023.
+
+# Index
+
+1. [Descrição do Problema e da Solução](#Descrição-do-Problema-e-da-Solução)
+1. [Análise Teórica](#Análise-Teórica)
+1. [Avaliação Experimental dos Resultados](#Avaliação-Experimental-dos-Resultados)
+
 # Descrição do Problema e da Solução
 
 A solução que encontrámos passa por encontrar o vértice mais à direita de um dado tabuleiro.
