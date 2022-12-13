@@ -1,5 +1,3 @@
-﻿
-
 # Descrição do Problema e da Solução
 
 A solução que encontrámos passa por encontrar o vértice mais à direita de um dado tabuleiro.
@@ -9,7 +7,7 @@ maior e 1. Seguidamente, geramos tabuleiros novos, cada um com um dos quadrados
 possíveis inseridos no seu canto mais à direita. O número de maneiras de ladrilhar o tabuleiro
 pedido vai ser a soma do número de maneiras de ladrilhar os novos tabuleiros criados. A
 condição de paragem da recursão é só ser possível inserir quadrados de lado 1 no tabuleiro ou
-termos um tabuleiro totalmente ladrilhado.
+termos um tabuleiro totalmente ladrilhado. <br>
 Se considerarmos a árvore de tabuleiros gerada por um dado tabuleiro, vão haver vários
 tabuleiros repetidos, existem várias formas distintas de ladrilhar parcialmente o tabuleiro incial
 e gerar um determinado tabuleiro especíﬁco. Para evitar calcular várias vezes as combinações
@@ -26,7 +24,7 @@ pseudocódigo.
 - Leitura de dados de entrada (read\_input):
 
     ```
-    read\_input()
+    read_input()
         board ← new Board
         board.y ← Read input
         board.x ← Read input
@@ -40,31 +38,31 @@ pseudocódigo.
 - Função inicial do problema (compute\_board):
 
     ```
-    compute\_board(board, table)
-    if null\_board(board) do
-    return 0 // resultado do problema é zero
-    end if
-    if width < 0.75\*height do
-    spin\_board(board)
-    endif
-    return get\_combinations(board, table)
+    compute_board(board, table)
+        if null_board(board) do
+            return 0 // resultado do problema é zero
+        end if
+        if width < 0.75\*height do
+            spin_board(board)
+        endif
+        return get_combinations(board, table)
     ```
 
-    Função que faz uso da auxiliar null\_board, O(Y), e da função auxiliar spin\_board,
+    Função que faz uso da auxiliar null_board, O(Y), e da função auxiliar spin_board,
     O(Y), nos casos em que o tabuleiro é um retângulo com Y > X. Chama a função
-    get\_combinations, O(X²), para obter o resultado do problema. Como rodamos o
+    get_combinations, O(X²), para obter o resultado do problema. Como rodamos o
     tabuleiro quando Y > X, então esta função é O(X²).
 
 - Função auxiliar para determinar se a board tem todos os cantos com valor zero (null\_board):
 
     ```
-    null\_board(board)
-    for i ← 0 to board.y - 1 do
-    if board.corners[i] != 0 do
-    return false
-    end if
-    endfor
-    return true
+    null_board(board)
+        for i ← 0 to board.y - 1 do
+            if board.corners[i] != 0 do
+                return false
+            end if
+        endfor
+        return true
     ```
 
     Função com um ciclo que percorre as linhas e termina se encontrar um canto com
@@ -74,31 +72,31 @@ pseudocódigo.
 - Rodar a board (spin\_board):
 
     ```
-    spin\_board(board)
-    corners ← new vector
-    for j ← 0 to board.corners[0] - 1 do
-    corners[j] ← board.y
-    endfor
-    for i ← 1 to board.y - 1 do
-    if board.corners[i] == board.x do
-    for j ← j to board.x - 1
-    corners[j] ← board.y - i
-    endfor
-    Exit for
-    else
-    while i < board.y and board.corners[i] == board.corners[i-1] do
-    i ← i+1
-    endwhile
-    for j ← j to board.corners[i] - 1 do
-    corners[j] ← board.y - i
-    endfor
-    endif
-    endfor
-    for j ← j to board.x – 1 do
-    corners[j] ← 0
-    endfor
-    board.x ↔ board.y
-    board.corners ← corners
+    spin_board(board)
+        corners ← new vector
+        for j ← 0 to board.corners[0] - 1 do
+            corners[j] ← board.y
+        endfor
+        for i ← 1 to board.y - 1 do
+            if board.corners[i] == board.x do
+                for j ← j to board.x - 1
+                    corners[j] ← board.y - i
+                endfor
+                Exit for
+            else
+                while i < board.y and board.corners[i] == board.corners[i-1] do
+                    i ← i+1
+                endwhile
+                for j ← j to board.corners[i] - 1 do
+                    corners[j] ← board.y - i
+                endfor
+            endif
+        endfor
+        for j ← j to board.x – 1 do
+            corners[j] ← 0
+        endfor
+        board.x ↔ board.y
+        board.corners ← corners
     ```
 
     O primeiro loop tem no máximo X iterações, pelo que é O(X). O segundo loop terá X ou
@@ -111,10 +109,10 @@ pseudocódigo.
 
     ```
     hash(board)
-    hash ← 0
-    for c in board.corners do
-    hash ← 17\*hash + hash\_number(i)
-    endfor
+        hash ← 0
+        for c in board.corners do
+            hash ← 17*hash + hash_number(i)
+        endfor
     ```
 
     Tem de percorrer todos os corners (que correspondem à altura), logo O(Y).
@@ -124,23 +122,24 @@ pseudocódigo.
 - Função principal que obtém o resultado (get\_combinations):
 
     ```
-    get\_combinations(board, table)
-    if Finished\_board(board) do
-    return 1
-    endif
-    if lookup\_board(board) do // if board is in table
-    return table[board].combinations
-    endif
-    answer ← 0
-    children ← new vector
-    place\_rightmost\_tile(children, board)
-    for b in children do
-    answer ← answer + get\_combinations(b, table)
-    insert\_board(answer, board, table)
-    return answer
+    get_combinations(board, table)
+        if finished_board(board) do
+            return 1
+        endif
+        if lookup\_board(board) do // if board is in table
+            return table[board].combinations
+        endif
+        answer ← 0
+        children ← new vector
+        place_rightmost_tile(children, board)
+        for b in children do
+            answer ← answer + getcombinations(b, table)
+        endfor
+        insert_board(answer, board, table)
+        return answer
     ```
 
-    Finished\_board é O(Y), lookup\_board e insert\_board são O(1) e place\_rightmost\_tile é
+    finished_board é O(Y), lookup_board e insert_board são O(1) e place_rightmost_tile é
     O(X²). children tem no máximo X elementos, uma vez que, devido á função spin\_board,
     X > Y (caso isto não se veriﬁque é porque a diferença é mínima e podemos aﬁrmar,
     aproximadamente, X = Y). Assim, temos T(X) = XT(X² - b) + O(X²), pois, mais uma vez,
@@ -152,16 +151,16 @@ pseudocódigo.
 - Pesquisa o indíce de uma board na hashtable (lookup\_board):
 
     ```
-    lookup\_board(board, table)
-    answer ← -1
-    while id != table.end do
-    if table[id].board == board do
-    answer ← id
-    Exit while
-    endif
-    id ← hash\_number(id)
-    endwhile
-    return answer
+    lookup_board(board, table)
+        answer ← -1
+        while id != table.end do
+            if table[id].board == board do
+                answer ← id
+                Exit while
+            endif
+            id ← hash\_number(id)
+        endwhile
+        return answer
     ```
 
     Pesquisa o indíce de uma board na hashtable, levando em conta o método de
@@ -172,12 +171,12 @@ pseudocódigo.
 - Adiciona uma board à hashtable (insert\_board):
 
     ```
-    insert\_board(answer, board, table)
-    cell ← new cell(answer, board)
-    while id != table.end do
-    id ← hash\_number(id)
-    endwhile
-    table[id] = cell
+    insert_board(answer, board, table)
+        cell ← new cell(answer, board)
+        while id != table.end do
+            id ← hash\_number(id)
+        endwhile
+        table[id] = cell
     ```
 
     Adiciona uma board, com o seu resultado, à hashtable levando em conta o método de
@@ -188,13 +187,13 @@ pseudocódigo.
 - Veriﬁca se chegámos ao ﬁm do cálculo da board passada como argumento (pois o maior quadrado já só pode ter tamanho 1) (ﬁnished\_board):
 
     ```
-    ﬁnished\_board(board)
-    for i ← 0 to board.y do
-    if board.corners[i] > 1 do
-    return false
-    endif
-    endfor
-    return true
+    ﬁnished_board(board)
+        for i ← 0 to board.y do
+            if board.corners[i] > 1 do
+                return false
+            endif
+        endfor
+        return true
     ```
 
     Função com um ciclo que percorre as linhas e termina se encontrar um canto com valor
@@ -203,62 +202,62 @@ pseudocódigo.
 - Veriﬁca se duas boards são iguais (equal\_boards):
 
     ```
-    equal\_boards(board1, board2)
-    if board1.y != board2.y or board1.x != board2.x do
-    return false
-    endif
-    for i ← 0 to board1.y do
-    if board.corners[i] != board2.corners[i]
-    return false
-    endif
-    endfor
-    return true
+    equal_boards(board1, board2)
+        if board1.y != board2.y or board1.x != board2.x do
+            return false
+        endif
+        for i ← 0 to board1.y do
+            if board.corners[i] != board2.corners[i]
+                return false
+            endif
+        endfor
+        return true
     ```
 
     No pior caso as boards são iguais e a função terá de percorrer todos os corners, que
     corresponde ao número de linhas da board, logo O(Y).
 
-- place\_rightmost\_tile:
+- place_rightmost_tile:
 
     ```
-    place\_rightmost\_tile(result, board)
-    max ← 0
-    for i ← 0 to board.y - 1 do
-    if board.corners[i] > board.corners[max] do
-    max ← i
-    endif
-    if board.corners[max] == board.x do
-    Exit for
-    endif
-    end for
-    tile\_size ← 0
-    if board.y – max >= board.corners[max] and board.corners[max] > tile\_size do
-    tile\_size ← board.corners[max]
-    endif
-    if board.coners[max] >= board.y – max and board.y – max > tile\_size
-    tile\_size ← board.y – max
-    endif
-    for i ← 0 to tile\_size - 1 do
-    if board.corners[max+i] < board.corners[max] do
-    tile\_size = i
-    Exit for
-    endif
-    endfor
-    for tile\_size ← tile\_size to 0 (descending) do
-    new\_corners ← new corners with same content as board.corners
-    new\_board ← new board with same x and y as board and new\_corners
-    for i ← 0 to tile\_size - 1 do
-    new\_board.corners[max+i] ← new\_board.corners[max+i] – tile\_size
-    endfor
-    Add new\_board to the end of result
-    endwhile
+    place_rightmost_tile(result, board)
+        max ← 0
+        for i ← 0 to board.y - 1 do
+            if board.corners[i] > board.corners[max] do
+                max ← i
+            endif
+            if board.corners[max] == board.x do
+                Exit for
+            endif
+        end for
+        tile_size ← 0
+        if board.y – max >= board.corners[max] and board.corners[max] > tile\_size do
+            tile_size ← board.corners[max]
+        endif
+        if board.coners[max] >= board.y – max and board.y – max > tile\_size
+            tile_size ← board.y – max
+        endif
+        for i ← 0 to tile\_size - 1 do
+            if board.corners[max+i] < board.corners[max] do
+                tile_size = i
+                Exit for
+            endif
+        endfor
+        for tile_size ← tile_size to 0 (descending) do
+            new_corners ← new corners with same content as board.corners
+            new_board ← new board with same x and y as board and new\_corners
+            for i ← 0 to tile_size - 1 do
+                new_board.corners[max+i] ← new_board.corners[max+i] – tile_size
+            endfor
+            Add new_board to the end of result
+        endfor
     ```
 
     O primeiro loop é O(Y) e o segundo depende do tamanho do ladrilho máximo, pelo que
     é O(X) ou O(Y). O terceiro for loop também depende do tamanho do ladrilho máximo,
     que é O(X²) ou O(Y²) pois é o (somatório de i=0 até tile\_size – 1) do (somatório de j=0
     até i-1). new\_corners terá no máximo X ou Y elementos. Sabemos que regra geral,
-    devido á função spin\_board, X > Y (caso isto não se veriﬁque é porque a diferença é
+    devido á função spin_board, X > Y (caso isto não se veriﬁque é porque a diferença é
     mínima e podemos aﬁrmar, aproximadamente, X = Y), com vista a isto, conclui-se que
     esta função é O(X²).
 
@@ -266,12 +265,16 @@ pseudocódigo.
 
 Para a avaliação experimental, foram gerados testes progressivamente maiores. A
 temporização da duração da resolução de cada teste foi feita com recurso ao comando “time”.
+
 As instâncias geradas são apresentadas no ﬁm do documento.
+
+![](https://github.com/Rua-Gouveia-Alliance/ladrilhos/blob/main/imgs/graph1.png)
 
 Logicamente, o gráﬁco não é linear quando o eixo X varia de acordo com o número de
 vértices. Trocando a variação deste eixo para uma coerente com o que foi proposto
 teoricamente:
 
+![](https://github.com/Rua-Gouveia-Alliance/ladrilhos/blob/main/imgs/graph2.png)
 
 Veriﬁcamos rapidamente que se trata de um gráﬁco linear, que corrobra a nossa análise
 teórica.
