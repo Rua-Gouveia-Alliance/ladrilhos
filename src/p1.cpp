@@ -191,12 +191,6 @@ Board* read_input() {
     
 }
 
-void print_board(Board* board) {
-    std::cout << "X: " << board->x << " Y: " << board->y << std::endl;
-    for (const auto & c : board->corners)
-        std::cout << c << std::endl;
-}
-
 int main() {
     // Create board and read input
     Board* board = read_input();
