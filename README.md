@@ -4,11 +4,14 @@ Project done in the scope of the course Analysis and Synthesis of Algorithms, IS
 
 # Index
 
-1. [Descrição do Problema e da Solução](#Descrição-do-Problema-e-da-Solução)
-1. [Análise Teórica](#Análise-Teórica)
-1. [Avaliação Experimental dos Resultados](#Avaliação-Experimental-dos-Resultados)
+1. [Relatório](#Relatório)
+    1. [Descrição do Problema e da Solução](#Descrição-do-Problema-e-da-Solução)
+    1. [Análise Teórica](#Análise-Teórica)
+    1. [Avaliação Experimental dos Resultados](#Avaliação-Experimental-dos-Resultados)
 
-# Descrição do Problema e da Solução
+# Relatório
+
+## Descrição do Problema e da Solução
 
 A solução que encontrámos passa por encontrar o vértice mais à direita de um dado tabuleiro.
 Depois, encontramos o maior quadrado que seja possível inserir nesse canto e, assim,
@@ -24,7 +27,7 @@ e gerar um determinado tabuleiro especíﬁco. Para evitar calcular várias veze
 destes tabuleiros repetidos, guardamos todos os tabuleiros cujo valor das possibilidades de
 ladrilhar já foi calculado numa hash table, aumentando assim a eﬁciência do nosso algoritmo.
 
-# Análise Teórica
+## Análise Teórica
 
 A complexidade total do algoritmo é O(X²), sendo X o número de colunas da board. Isto porque
 a leitura da entrada é O(Y), mas o algoritmo roda a board (troca o Y com o X) sempre que Y
@@ -271,7 +274,7 @@ pseudocódigo.
     mínima e podemos aﬁrmar, aproximadamente, X = Y), com vista a isto, conclui-se que
     esta função é O(X²).
 
-# Avaliação Experimental dos Resultados
+## Avaliação Experimental dos Resultados
 
 Para a avaliação experimental, foram gerados testes progressivamente maiores. A
 temporização da duração da resolução de cada teste foi feita com recurso ao comando “time”.
